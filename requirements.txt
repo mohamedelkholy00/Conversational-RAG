@@ -1,0 +1,13 @@
+streamlit
+langchain
+chromadb
+huggingface-hub
+langchain_groq
+langchain_core
+dotenv
+langchain_community
+langchain_huggingface
+langchain_chroma
+torchvision
+sentence_transformers
+langchain
