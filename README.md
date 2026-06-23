@@ -1,109 +1,164 @@
-# NLP Competition — RAG AI Agent Challenge
+# 💬 DocChat AI
 
-Welcome to the NLP Competition! Your mission is to build a **production-ready AI Agent** that answers questions based on a provided knowledge base of PDF documents using Retrieval-Augmented Generation (RAG).
-
----
-
-## Overview
-
-You will build an AI agent that:
-
-1. Receives a user question
-2. Uses a **retrieval tool** to search a knowledge base and return relevant chunks from the provided PDF
-3. Uses those chunks as context to generate an accurate, grounded answer
-
-The agent must be able to reason over the retrieved chunks and produce a final response — it should **not** answer from memory alone.
+> A conversational RAG chatbot for your PDF documents — built with LangChain, Groq, and Streamlit, styled with an Apple Liquid Glass dark mode UI.
 
 ---
 
-## Knowledge Base — PDF Document
+## ✨ Features
 
-The knowledge base consists of a single PDF:
-
-**Encyclopedia of Ancient Egypt** — Margaret Bunson
-
-The file is available under the `/pdf` directory in the competition workspace.
-
-Chunk it, embed it, and load it into your retrieval system before building the agent.
-
----
-
-## LLM Providers
-
-You **must** use **Gemini** and/or **Groq**. API keys are provided below — use them directly in your project.
-
-### API Keys
-
-| Provider | API Key |
-|----------|---------|
-| **Google Gemini** | `REPLACE_WITH_GEMINI_API_KEY` |
-| **Groq** | `REPLACE_WITH_GROQ_API_KEY` |
-
-### API Documentation
-- Gemini: https://ai.google.dev/gemini-api/docs
-- Groq: https://console.groq.com/docs/openai
+- 📄 **Multi-PDF upload** — drag and drop one or more PDFs and index them instantly
+- 🧠 **Conversational memory** — follow-up questions are understood in full context using chat history
+- 🔒 **Strict grounding** — two-layer validation ensures answers come _only_ from your documents, never from the model's general knowledge
+- 🔍 **Not-found feedback** — a clear styled card appears when the topic isn't in your files
+- 📚 **Source transparency** — every answer links back to the document chunks that produced it
+- 🪟 **Apple Liquid Glass UI** — frosted glass surfaces, animated ambient orbs, and spring-motion bubbles in a cinematic dark mode
+- 🗂️ **Session management** — run multiple independent conversation threads by session ID
 
 ---
 
-## Technical Requirements
+## 🛠️ Tech Stack
 
-### What You Must Build
-
-#### 1. Retrieval Tool
-- A function/tool that takes a query string as input
-- Searches your vector store / knowledge base
-- Returns the top-N most relevant text chunks
-- The agent must **call this tool** explicitly — do not just stuff all chunks into the prompt
-
-#### 2. AI Agent
-- An agent that receives a user question
-- Decides when and how to call the retrieval tool
-- Reasons over the returned chunks
-- Produces a final, grounded answer based on the document
-
-#### 3. Production-Ready API (Required)
-Your project must expose a REST API with at least the following endpoints:
-
-```
-POST /ask
-```
-**Request body:**
-```json
-{
-  "question": "What were the main gods of ancient Egypt?"
-}
-```
-**Response:**
-```json
-{
-  "answer": "The main gods of ancient Egypt included Ra, Osiris, Isis...",
-  "chunks_used": ["chunk text 1...", "chunk text 2..."]
-}
-```
-
-```
-GET /health
-```
-Returns service status — used to verify the API is running.
-
-```
-GET /docs
-```
-Auto-generated API documentation (e.g., Swagger/OpenAPI if using FastAPI).
-
-### Bonus — UI
-Build a GUI using any tool that you want to make the user able to interact with your agent
+| Layer         | Technology                           |
+| ------------- | ------------------------------------ |
+| UI            | Streamlit                            |
+| LLM           | Groq — `llama-3.3-70b-versatile`     |
+| Embeddings    | HuggingFace — `all-MiniLM-L6-v2`     |
+| Vector Store  | ChromaDB                             |
+| RAG Framework | LangChain (Classic)                  |
+| PDF Parsing   | PyPDFLoader                          |
+| Styling       | Custom CSS — Apple Liquid Glass Dark |
 
 ---
 
-## Freedom of Choice
+## 📦 Installation
 
-You are free to use **any framework, library, or technology** you prefer to build this project.
+### 1. Clone the repository
 
-> ⚠️ **Vector Database:** You must use a **cloud-hosted vector database**.
+```bash
+git clone https://github.com/your-username/docchat-ai.git
+cd docchat-ai
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv venv
+source venv/bin/activate       # Windows: venv\Scripts\activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-Good luck to all teams! 🎉
+## 📋 Requirements
 
-*For questions, reach out to the competition organizers.*
+Create a `requirements.txt` with:
+
+```
+streamlit
+langchain-classic
+langchain-core
+langchain-community
+langchain-chroma
+langchain-groq
+langchain-huggingface
+langchain-text-splitters
+chromadb
+huggingface-hub
+sentence-transformers
+torchvision
+pypdf
+python-dotenv
+```
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+HF_TOKEN=your_huggingface_token_here
+```
+
+| Variable       | Where to get it                                   |
+| -------------- | ------------------------------------------------- |
+| `GROQ_API_KEY` | [console.groq.com](-----------------------------) |
+| `HF_TOKEN`     | [huggingface.co/settings/tokens](---------------) |
+
+---
+
+## ▶️ Running the App
+
+```bash
+streamlit run app.py
+```
+
+Then open your browser at **http://localhost:8501**
+
+---
+
+## 🧭 How to Use
+
+1. **Upload PDFs** — use the sidebar file uploader to select one or more PDF files
+2. **Process** — click **⚡ Process Documents** to chunk and index them into ChromaDB
+3. **Set a Session ID** — optionally name your session to keep threads separate
+4. **Ask questions** — type in the input bar and click **➤** to send
+5. **View sources** — expand the source chunks under any answer to see exactly where it came from
+6. **Clear** — click **🗑️ Clear Conversation** to reset the chat history for the current session
+
+---
+
+## 🔒 Answer Grounding — How It Works
+
+DocChat AI uses two independent layers to prevent hallucination:
+
+**Layer 1 — Retriever pre-check**
+Before the LLM is called, the retriever queries ChromaDB. If no relevant chunks are found, the question is immediately flagged as not found and the LLM is never invoked.
+
+**Layer 2 — LLM token check**
+The system prompt instructs the model to respond with the exact token `NOT_FOUND_IN_DOCUMENTS` if it cannot find the answer in the provided context. The app detects this token and displays the styled "not found" card instead of showing the raw model output.
+
+---
+
+## 🏗️ Project Structure
+
+```
+docchat-ai/
+├── app.py               # Main Streamlit application
+├── .env                 # API keys (never commit this)
+├── requirements.txt     # Python dependencies
+└── README.md            # This file
+```
+
+---
+
+## 🎨 UI Design
+
+The interface is built on an **Apple Liquid Glass** aesthetic:
+
+- **Ambient orbs** — three animated radial gradients (purple, cyan, pink) breathe behind all surfaces
+- **Frosted glass panels** — sidebar, bubbles, and inputs use `backdrop-filter: blur(24–40px) saturate(180–200%)` with semi-transparent fills
+- **Spring-motion messages** — chat bubbles animate in with a `cubic-bezier(0.34, 1.56, 0.64, 1)` spring curve
+- **Semantic glass tints** — bot bubbles are neutral frost, user bubbles are blue-tinted, not-found cards are red-tinted
+- **Typography** — Inter with `-0.4px` letter-spacing and antialiasing, matching Apple's SF Pro feel
+
+---
+
+## ⚠️ Notes
+
+- PDFs are processed in memory via temporary files and deleted immediately after loading — nothing is stored on disk
+- The vector store is rebuilt each time you click **Process Documents**
+- Chat history lives in Streamlit session state and resets on page refresh or when you click Clear
+- Chunk size is set to 500 tokens with 50-token overlap — tune these in `build_rag_chain()` for your use case
+
+---
+
+## 📄 License
+
+MIT — free to use, modify, and distribute.
